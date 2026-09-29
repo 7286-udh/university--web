@@ -11,7 +11,7 @@ interface DashboardProps {
 export default function Dashboard({ token, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<'home' | 'students' | 'courses' | 'schedules' | 'enrollments' | 'grading' | 'academic_grades'>('home');
   
-  // Khởi tạo trực tiếp danh sách sinh viên từ localStorage để tránh bị trống
+  // Khởi tạo trực tiếp danh sách sinh viên từ localStorage, nếu trống thì tạo dữ liệu mặc định
   const [students, setStudents] = useState<any[]>(() => {
     try {
       const saved = localStorage.getItem('local_students_list');
@@ -148,25 +148,25 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
 
   const fetchData = async () => {
     try {
+      // Đọc và đồng bộ danh sách sinh viên chuẩn xác từ localStorage trước tiên
+      const savedStudents = localStorage.getItem('local_students_list');
+      let activeStudents = students;
+      if (savedStudents) {
+        try {
+          const parsed = JSON.parse(savedStudents);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setStudents(parsed);
+            activeStudents = parsed;
+          }
+        } catch {}
+      }
+
       const headers = { Authorization: `Bearer ${token}` };
       const [resCou, resSch, resEnr] = await Promise.all([
         axios.get('https://university-web-u1xo.onrender.com/api/courses', { headers }),
         axios.get('https://university-web-u1xo.onrender.com/api/schedules', { headers }).catch(() => ({ data: { data: [] } })),
         axios.get('https://university-web-u1xo.onrender.com/api/enrollments', { headers })
       ]);
-
-      // Đồng bộ danh sách sinh viên mới nhất từ localStorage
-      const savedStudents = localStorage.getItem('local_students_list');
-      let currentStudents = students;
-      if (savedStudents) {
-        try {
-          const parsed = JSON.parse(savedStudents);
-          if (Array.isArray(parsed)) {
-            setStudents(parsed);
-            currentStudents = parsed;
-          }
-        } catch {}
-      }
 
       const courseList = resCou.data.data || resCou.data || [];
       setCourses(courseList);
@@ -179,9 +179,9 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
       const savedGrades = localStorage.getItem('student_academic_grades');
       if (savedGrades) setAcademicGrades(JSON.parse(savedGrades));
 
-      if (currentStudents.length > 0) {
-        if (!selectedStudentId) setSelectedStudentId(currentStudents[0].id);
-        if (!gradeStudentId) setGradeStudentId(currentStudents[0].id);
+      if (activeStudents.length > 0) {
+        if (!selectedStudentId) setSelectedStudentId(activeStudents[0].id);
+        if (!gradeStudentId) setGradeStudentId(activeStudents[0].id);
       }
       if (courseList.length > 0) {
         if (!selectedCourseId) setSelectedCourseId(courseList[0].id);
@@ -259,7 +259,17 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
       password: password || '123456'
     };
 
-    const updatedStudents = [...students, newStudent];
+    // Lấy danh sách hiện tại từ localStorage để đảm bảo không bị ghi đè mất dữ liệu cũ
+    const currentSaved = localStorage.getItem('local_students_list');
+    let currentList = students;
+    try {
+      const parsed = currentSaved ? JSON.parse(currentSaved) : [];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        currentList = parsed;
+      }
+    } catch {}
+
+    const updatedStudents = [...currentList, newStudent];
     setStudents(updatedStudents);
     localStorage.setItem('local_students_list', JSON.stringify(updatedStudents));
 
@@ -269,9 +279,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
 
     setMessage('Thêm sinh viên và thiết lập mật khẩu thành công!');
     setMssv(''); setFullName(''); setEmail(''); setPassword('');
-    
-    // Gọi lại fetchData để đồng bộ toàn bộ state
-    fetchData();
   };
 
   const handleDeleteStudent = (id: string, targetMssv: string) => {
@@ -286,7 +293,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
     localStorage.setItem('student_passwords', JSON.stringify(studentPasswords));
 
     setMessage('Xóa sinh viên thành công!');
-    fetchData();
   };
 
   const handleStartEditStudent = (s: any) => {
@@ -317,7 +323,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
 
     setMessage('Cập nhật thông tin và mật khẩu sinh viên thành công!');
     setEditingStudentId(null);
-    fetchData();
   };
 
   const handleAddCourse = async (e: React.FormEvent) => {
