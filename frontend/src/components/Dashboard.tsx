@@ -189,12 +189,7 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
       return;
     }
 
-    const currentAdminPass = localStorage.getItem('admin_password') || 'admin123';
-    if (oldPassword !== currentAdminPass) {
-      setMessage('⚠️ Mật khẩu hiện tại không chính xác!');
-      return;
-    }
-
+    // Lưu thẳng mật khẩu mới vào localStorage mà không bắt bẻ mật khẩu cũ nữa
     localStorage.setItem('admin_password', newPassword);
     setMessage('🔒 Đổi mật khẩu tài khoản Admin thành công!');
     setShowPasswordModal(false);
