@@ -180,12 +180,18 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPassword || !confirmPassword) {
-      setMessage('⚠️ Vui lòng nhập đầy đủ thông tin mật khẩu mới!');
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setMessage('⚠️ Vui lòng nhập đầy đủ thông tin mật khẩu!');
       return;
     }
     if (newPassword !== confirmPassword) {
       setMessage('⚠️ Mật khẩu mới và xác nhận mật khẩu không khớp!');
+      return;
+    }
+
+    const currentAdminPass = localStorage.getItem('admin_password') || 'admin123';
+    if (oldPassword !== currentAdminPass) {
+      setMessage('⚠️ Mật khẩu hiện tại không chính xác!');
       return;
     }
 
