@@ -139,11 +139,23 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
         axios.get('https://university-web-u1xo.onrender.com/api/enrollments', { headers })
       ]);
 
+      let studentList = [];
       const savedStudents = localStorage.getItem('local_students_list');
-      const studentList = savedStudents ? JSON.parse(savedStudents) : [
-        { id: '1', mssv: '2029260145', fullName: 'Nguyễn Minh Đăng Huy', email: 'huy@student.edu.vn', password: '123' },
-        { id: '2', mssv: '11111111', fullName: 'tu', email: 'nguyenminhtoan787@gmail.com', password: '123456' }
-      ];
+      if (savedStudents) {
+        try {
+          studentList = JSON.parse(savedStudents);
+        } catch {
+          studentList = [];
+        }
+      }
+
+      if (!studentList || studentList.length === 0) {
+        studentList = [
+          { id: '1', mssv: '2029260145', fullName: 'Nguyễn Minh Đăng Huy', email: 'huy@student.edu.vn', password: '123' },
+          { id: '2', mssv: '11111111', fullName: 'tu', email: 'nguyenminhtoan787@gmail.com', password: '123456' }
+        ];
+        localStorage.setItem('local_students_list', JSON.stringify(studentList));
+      }
 
       setStudents(studentList);
 
@@ -189,7 +201,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
       return;
     }
 
-    // Lưu thẳng mật khẩu mới vào localStorage mà không bắt bẻ mật khẩu cũ nữa
     localStorage.setItem('admin_password', newPassword);
     setMessage('🔒 Đổi mật khẩu tài khoản Admin thành công!');
     setShowPasswordModal(false);
