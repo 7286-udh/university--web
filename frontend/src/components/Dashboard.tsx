@@ -134,12 +134,11 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const [resCou, resSch, resEnr] = await Promise.all([
-        axios.get('http://localhost:3000/api/courses', { headers }),
-        axios.get('http://localhost:3000/api/schedules', { headers }).catch(() => ({ data: { data: [] } })),
-        axios.get('http://localhost:3000/api/enrollments', { headers })
+        axios.get('https://university-web-u1xo.onrender.com/api/courses', { headers }),
+        axios.get('https://university-web-u1xo.onrender.com/api/schedules', { headers }).catch(() => ({ data: { data: [] } })),
+        axios.get('https://university-web-u1xo.onrender.com/api/enrollments', { headers })
       ]);
 
-      // Lấy danh sách sinh viên từ localStorage (hoặc mảng rỗng nếu chưa có)
       const savedStudents = localStorage.getItem('local_students_list');
       const studentList = savedStudents ? JSON.parse(savedStudents) : [
         { id: '1', mssv: '2029260145', fullName: 'Nguyễn Minh Đăng Huy', email: 'huy@student.edu.vn', password: '123' },
@@ -224,7 +223,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
     setMessage(`Đã ${newStatus ? 'mở' : 'khóa'} đăng ký cho học phần [${semName}] và gửi thông báo thành công tới sinh viên!`);
   };
 
-  // Thêm sinh viên lưu trực tiếp vào localStorage
   const handleAddStudent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!mssv || !fullName || !email) {
@@ -244,7 +242,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
     setStudents(updatedStudents);
     localStorage.setItem('local_students_list', JSON.stringify(updatedStudents));
 
-    // Lưu đồng thời vào từ điển mật khẩu sinh viên để dùng khi Login
     const studentPasswords = JSON.parse(localStorage.getItem('student_passwords') || '{}');
     studentPasswords[mssv] = password || '123456';
     localStorage.setItem('student_passwords', JSON.stringify(studentPasswords));
@@ -300,7 +297,7 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
   const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/api/courses', { code: courseCode, name: courseName, credits: Number(credits), semester }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post('https://university-web-u1xo.onrender.com/api/courses', { code: courseCode, name: courseName, credits: Number(credits), semester }, { headers: { Authorization: `Bearer ${token}` } });
       setMessage('Thêm môn học thành công!');
       setCourseCode(''); setCourseName(''); setCredits(3);
       fetchData(); 
@@ -312,7 +309,7 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
   const handleDeleteCourse = async (id: string) => {
     if (!window.confirm('Xóa môn học này sẽ xóa cả lịch học và đăng ký liên quan?')) return;
     try {
-      await axios.delete(`http://localhost:3000/api/courses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`https://university-web-u1xo.onrender.com/api/courses/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setMessage('Xóa môn học thành công!');
       fetchData();
     } catch (err: any) {
@@ -330,7 +327,7 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
 
   const handleSaveEditCourse = async (id: string) => {
     try {
-      await axios.put(`http://localhost:3000/api/courses/${id}`, { code: editCourseCode, name: editCourseName, credits: Number(editCredits), semester: editSemester }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`https://university-web-u1xo.onrender.com/api/courses/${id}`, { code: editCourseCode, name: editCourseName, credits: Number(editCredits), semester: editSemester }, { headers: { Authorization: `Bearer ${token}` } });
       setMessage('Cập nhật môn học thành công!');
       setEditingCourseId(null);
       fetchData();
@@ -348,9 +345,9 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       if (editingScheduleId) {
-        await axios.delete(`http://localhost:3000/api/schedules/${editingScheduleId}`, { headers }).catch(() => {});
+        await axios.delete(`https://university-web-u1xo.onrender.com/api/schedules/${editingScheduleId}`, { headers }).catch(() => {});
       }
-      await axios.post('http://localhost:3000/api/schedules', { 
+      await axios.post('https://university-web-u1xo.onrender.com/api/schedules', { 
         studentId: selectedStudentId, courseId: selectedCourseId, date: scheduleDate, dayOfWeek, session, period, 
         room: isOnline ? 'Học trực tuyến (Online)' : room, isOnline, type 
       }, { headers });
@@ -380,7 +377,7 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
   const handleDeleteSchedule = async (id: string) => {
     if (!window.confirm('Bạn có chắc muốn xóa lịch học này?')) return;
     try {
-      await axios.delete(`http://localhost:3000/api/schedules/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`https://university-web-u1xo.onrender.com/api/schedules/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setMessage('Đã xóa lịch học!');
       fetchData();
     } catch (err) {
@@ -390,7 +387,7 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
 
   const handleCancelEnrollmentWithReason = async (id: string, enrollmentInfo: any) => {
     try {
-      await axios.delete(`http://localhost:3000/api/enrollments/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`https://university-web-u1xo.onrender.com/api/enrollments/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       const studentMssv = enrollmentInfo.student?.mssv;
       const courseName = enrollmentInfo.course?.name;
       if (studentMssv) {

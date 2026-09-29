@@ -37,7 +37,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
+      const response = await axios.post('https://university-web-u1xo.onrender.com/api/auth/login', {
         username,
         password,
       });
@@ -77,7 +77,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       } else {
         // Nếu không có trong danh sách local, thử gọi API backend xác thực MSSV
         try {
-          const response = await axios.post('http://localhost:3000/api/auth/student-login', { mssv });
+          const response = await axios.post('https://university-web-u1xo.onrender.com/api/auth/student-login', { mssv });
           studentData = response.data.data;
           token = response.data.token;
 

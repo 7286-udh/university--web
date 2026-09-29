@@ -132,9 +132,9 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const [resCou, resSch, resEnr] = await Promise.all([
-        axios.get('http://localhost:3000/api/courses', { headers }),
-        axios.get('http://localhost:3000/api/schedules', { headers }).catch(() => ({ data: { data: [] } })),
-        axios.get('http://localhost:3000/api/enrollments', { headers })
+        axios.get('https://university-web-u1xo.onrender.com/api/courses', { headers }),
+        axios.get('https://university-web-u1xo.onrender.com/api/schedules', { headers }).catch(() => ({ data: { data: [] } })),
+        axios.get('https://university-web-u1xo.onrender.com/api/enrollments', { headers })
       ]);
       
       const courseList = resCou.data.data || resCou.data || [];
@@ -218,7 +218,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
     }
 
     try {
-      await axios.post('http://localhost:3000/api/enrollments', { studentId: studentInfo.id, courseId }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post('https://university-web-u1xo.onrender.com/api/enrollments', { studentId: studentInfo.id, courseId }, { headers: { Authorization: `Bearer ${token}` } });
       setMessage('Đăng ký học phần thành công!');
       fetchData();
     } catch (err: any) {
@@ -230,7 +230,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
     e.preventDefault();
     if (!selectedCourseId || !studentInfo) return;
     try {
-      await axios.post('http://localhost:3000/api/schedules', {
+      await axios.post('https://university-web-u1xo.onrender.com/api/schedules', {
         courseId: selectedCourseId, studentId: studentInfo.id, date: scheduleDate, dayOfWeek, session, period,
         room: isOnline ? 'Học trực tuyến (Online)' : room, isOnline, type
       }, { headers: { Authorization: `Bearer ${token}` } });
@@ -266,8 +266,8 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
     }
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      await axios.delete(`http://localhost:3000/api/schedules/${editingScheduleId}`, { headers }).catch(() => {});
-      await axios.post('http://localhost:3000/api/schedules', {
+      await axios.delete(`https://university-web-u1xo.onrender.com/api/schedules/${editingScheduleId}`, { headers }).catch(() => {});
+      await axios.post('https://university-web-u1xo.onrender.com/api/schedules', {
         studentId: studentInfo.id, courseId: editCourseId, date: editScheduleDate, dayOfWeek: editDayOfWeek,
         session: editSession, period: editPeriod, room: editRoom, isOnline: editIsOnline, type: editType
       }, { headers });
@@ -286,7 +286,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
     }
     if (!window.confirm('Bạn có chắc muốn xóa lịch học này?')) return;
     try {
-      await axios.delete(`http://localhost:3000/api/schedules/${sch.id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`https://university-web-u1xo.onrender.com/api/schedules/${sch.id}`, { headers: { Authorization: `Bearer ${token}` } });
       setMessage('Đã xóa lịch học!');
       fetchData();
     } catch (err) {
@@ -701,7 +701,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
                     <th style={{ padding: '12px 15px' }}>Tên Môn Học</th>
                     <th style={{ padding: '12px 15px', textAlign: 'center' }}>Tín Chỉ</th>
                     <th style={{ padding: '12px 15px', textAlign: 'center' }}>Điểm Thang 10</th>
-                    <th style={{ padding: '12px 15px', textAlign: 'center' }}>Điểm Thang 4</th>
+                    <th style={{ padding: '12px 15px', textAlign: 'center' }, { padding: '12px 15px', textAlign: 'center' }}>Điểm Thang 4</th>
                     <th style={{ padding: '12px 15px', textAlign: 'center' }}>Điểm Chữ</th>
                   </tr>
                 </thead>
@@ -802,7 +802,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Tiết / Giờ</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', filename: 'editPeriod', fontWeight: 'bold', marginBottom: '4px' }}>Tiết / Giờ</label>
                     <input type="text" value={editPeriod} onChange={e => setEditPeriod(e.target.value)} required style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '13px' }} />
                   </div>
                 </div>
