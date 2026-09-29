@@ -11,7 +11,23 @@ interface DashboardProps {
 export default function Dashboard({ token, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<'home' | 'students' | 'courses' | 'schedules' | 'enrollments' | 'grading' | 'academic_grades'>('home');
   
-  const [students, setStudents] = useState<any[]>([]);
+  // Khởi tạo trực tiếp danh sách sinh viên từ localStorage để tránh bị trống
+  const [students, setStudents] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem('local_students_list');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    const defaultStudents = [
+      { id: '1', mssv: '2029260145', fullName: 'Nguyễn Minh Đăng Huy', email: 'huy@student.edu.vn', password: '123' },
+      { id: '2', mssv: '11111111', fullName: 'tu', email: 'nguyenminhtoan787@gmail.com', password: '123456' }
+    ];
+    localStorage.setItem('local_students_list', JSON.stringify(defaultStudents));
+    return defaultStudents;
+  });
+
   const [courses, setCourses] = useState<any[]>([]);
   const [schedules, setSchedules] = useState<any[]>([]);
   const [enrollments, setEnrollments] = useState<any[]>([]);
@@ -139,26 +155,6 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
         axios.get('https://university-web-u1xo.onrender.com/api/enrollments', { headers })
       ]);
 
-      let studentList = [];
-      const savedStudents = localStorage.getItem('local_students_list');
-      if (savedStudents) {
-        try {
-          studentList = JSON.parse(savedStudents);
-        } catch {
-          studentList = [];
-        }
-      }
-
-      if (!studentList || studentList.length === 0) {
-        studentList = [
-          { id: '1', mssv: '2029260145', fullName: 'Nguyễn Minh Đăng Huy', email: 'huy@student.edu.vn', password: '123' },
-          { id: '2', mssv: '11111111', fullName: 'tu', email: 'nguyenminhtoan787@gmail.com', password: '123456' }
-        ];
-        localStorage.setItem('local_students_list', JSON.stringify(studentList));
-      }
-
-      setStudents(studentList);
-
       const courseList = resCou.data.data || resCou.data || [];
       setCourses(courseList);
       setSchedules(resSch.data.data || []);
@@ -170,9 +166,9 @@ export default function Dashboard({ token, onLogout }: DashboardProps) {
       const savedGrades = localStorage.getItem('student_academic_grades');
       if (savedGrades) setAcademicGrades(JSON.parse(savedGrades));
 
-      if (studentList.length > 0) {
-        if (!selectedStudentId) setSelectedStudentId(studentList[0].id);
-        if (!gradeStudentId) setGradeStudentId(studentList[0].id);
+      if (students.length > 0) {
+        if (!selectedStudentId) setSelectedStudentId(students[0].id);
+        if (!gradeStudentId) setGradeStudentId(students[0].id);
       }
       if (courseList.length > 0) {
         if (!selectedCourseId) setSelectedCourseId(courseList[0].id);
