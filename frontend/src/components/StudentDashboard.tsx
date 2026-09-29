@@ -39,7 +39,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
   // State điểm số toàn trường do Admin nhập
   const [studentGrades, setStudentGrades] = useState<any[]>([]);
 
-  const [semesterRegistrationStatus, setSemesterRegistrationStatus] = useState<{ [key: string]: boolean }>(() => {
+  const [semesterRegistrationStatus] = useState<{ [key: string]: boolean }>(() => {
     try {
       const saved = localStorage.getItem('semesterRegistrationStatus');
       return saved ? JSON.parse(saved) : {};
@@ -55,7 +55,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
   const [period, setPeriod] = useState('Tiết 1 - 3');
   const [room, setRoom] = useState('Phòng A101');
   const [isOnline, setIsOnline] = useState(false);
-  const [type, setType] = useState('Lý thuyết');
+  const [type] = useState('Lý thuyết');
 
   const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
   const [editCourseId, setEditCourseId] = useState('');
@@ -701,7 +701,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
                     <th style={{ padding: '12px 15px' }}>Tên Môn Học</th>
                     <th style={{ padding: '12px 15px', textAlign: 'center' }}>Tín Chỉ</th>
                     <th style={{ padding: '12px 15px', textAlign: 'center' }}>Điểm Thang 10</th>
-                    <th style={{ padding: '12px 15px', textAlign: 'center' }, { padding: '12px 15px', textAlign: 'center' }}>Điểm Thang 4</th>
+                    <th style={{ padding: '12px 15px', textAlign: 'center' }}>Điểm Thang 4</th>
                     <th style={{ padding: '12px 15px', textAlign: 'center' }}>Điểm Chữ</th>
                   </tr>
                 </thead>
@@ -802,7 +802,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', filename: 'editPeriod', fontWeight: 'bold', marginBottom: '4px' }}>Tiết / Giờ</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Tiết / Giờ</label>
                     <input type="text" value={editPeriod} onChange={e => setEditPeriod(e.target.value)} required style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '13px' }} />
                   </div>
                 </div>
@@ -826,7 +826,7 @@ export default function StudentDashboard({ token, onLogout }: StudentDashboardPr
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>Hình thức</label>
-                    <select value={editIsOnline ? 'online' : 'offline'} onChange={e => setEditIsOnline(e.target.value === 'online')} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '13px' }}>
+                    <select value={editIsOnline ? 'online' : 'offline'} onChange={e => setIsOnline(e.target.value === 'online')} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #d1d5db', fontSize: '13px' }}>
                       <option value="offline">Trực tiếp</option><option value="online">Online</option>
                     </select>
                   </div>
